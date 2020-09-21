@@ -8,8 +8,7 @@ var io = require("socket.io").listen(server);							//#Phải khởi tạo io sa
 
 server.listen(process.env.PORT || 3000);										// Cho socket server (chương trình mạng) lắng nghe ở port 3000
 
-var ip = require('ip');
-console.log("Server nodejs chay tai dia chi: " + ip.address());
+console.log("Server nodejs doi ket noi tu client");
 
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
