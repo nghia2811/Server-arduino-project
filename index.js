@@ -1,86 +1,55 @@
 var express = require("express");
 var app = express();
-//#Khởi tạo một chương trình mạng (app)
-//#include thư viện http - Tìm thêm về từ khóa http nodejs trên google nếu bạn muốn tìm hiểu thêm. 
-//Nhưng theo kinh nghiệm của mình, Javascript trong môi trường NodeJS cực kỳ rộng lớn, khi bạn bí thì nên tìm hiểu không nên ngồi đọc và cố gắng học thuộc hết cái reference (Tài liêu tham khảo) của nodejs làm gì. Vỡ não đó!
-var server = require('http').createServer(app);					
-var io = require("socket.io").listen(server);							//#Phải khởi tạo io sau khi tạo app!
-
-server.listen(process.env.PORT || 3000);										// Cho socket server (chương trình mạng) lắng nghe ở port 3000
-
-var ip = require('ip');
-console.log("Server nodejs chay tai dia chi: " + ip.address());
+var server = require("http").createServer(app);
+var io = require("socket.io").listen(server);
+var fs = require("fs");
+server.listen(process.env.PORT || 3000);
 
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
-// //giải nén chuỗi JSON thành các OBJECT
-// function ParseJson(jsondata) {
-//     ​try {
-//         ​return JSON.parse(jsondata)
-//     ​} catch (error) {
-// 		​return null
-// 	}
-//     ​
-// }
- 
-// //Gửi dữ liệu thông qua 
-// function sendTime() {
-	
-// 	//Đây là một chuỗi JSON
-// 	var json = {
-// 		name : "nguyen trung nghia", 	      //kiểu chuỗi
-//      ​ESP8266: 12,						   //số nguyên
-// 		soPi: 3.14,							  //số thực
-// 		time: new Date()					  //Đối tượng Thời gian
-//     ​}
-//     ​io.sockets.emit('atime', json)
-// }
- 
-//Khi có mệt kết nối được tạo giữa Socket Client và Socket Server
-io.on('connection', function(socket) {	//'connection' (1) này khác gì với 'connection' (2)
-	//hàm console.log giống như hàm Serial.println trên Arduino
-	console.log("Có thiết bị vừa được kết nối! " + socket.id);
-	 
-	//Khi lắng nghe được lệnh "connection" với một tham số, và chúng ta đặt tên tham số là message. Mình thích gì thì mình đặt thôi.
-	socket.on('connection', function (message) {
-		console.log(message);
+console.log("Server is running!!");
+
+var arrayUser = [];
+
+io.sockets.on('connect', function (socket) {
+
+    console.log("Có thiết bị vừa được kết nối! " + socket.id);
+
+    socket.on('client-register-user', function (data) {
+
+        if (arrayUser.indexOf(data) == -1) {
+            //Ko ton tai user -> dc phep add user
+            arrayUser.push(data);
+
+            //gan ten socket cho user
+            socket.un = data;
+
+            ////gui danh sach user ve tat car cac may
+            io.sockets.emit('server-send-userlist', { "danhsach": arrayUser });
+        }
+
     });
-	
-	socket.on('go-ahead', function (message) {
-		console.log("go ahead");
-		io.sockets.emit('go-ahead', { "message": "goahead" });
-	});
 
-	socket.on('go-back', function (message) {
-		console.log("go back");
-		io.sockets.emit('go-back', { "message": "goback" });
-	});
-
-	socket.on('left', function (message) {
-		console.log("left");
-		io.sockets.emit('left', { "message": "left" });
-	});
-
-	socket.on('right', function (message) {
-		console.log("right");
-		io.sockets.emit('right', { "message": "right" });
-	});
-	
-	socket.on('stop', function (message) {
-		console.log("stop");
-		io.sockets.emit('stop', { "message": "stop" });
+    socket.on('client-request-userlist', function () {
+        ////gui danh sach user ve tat car cac may
+        io.sockets.emit('server-send-userlist', { "danhsach": arrayUser });
     });
-	
-	//khi lắng nghe được lệnh "atime" với một tham số, và chúng ta đặt tên tham số đó là data. Mình thích thì mình đặt thôi
-    // ​socket.on('atime', function(data) {
-    //     ​sendTime()
-    //     ​console.log(data)
-    // ​})
-	
-	// socket.on('arduino', function (data) {
-	//   io.sockets.emit('arduino', { message: 'R0' });
-    //   ​console.log(data)
-    // ​})
+
+    socket.on('client-send-message', function (data) {
+        ////gui danh sach user ve tat car cac may
+        io.sockets.emit('server-send-message', {
+            "user": data.user,
+            "message": data.message
+        });
+    });
+
+    socket.on('client-exits', function (data) {
+        const index = arrayUser.indexOf(data);
+        if (index > -1) {
+            arrayUser.splice(index, 1);
+        }
+    });
+
 });
