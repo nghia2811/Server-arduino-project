@@ -4,6 +4,9 @@
   "private": "true",
   "dependencies": {
     "express": "*",
-    "socket.io": "*"
+    "firebase": "^8.4.3",
+    "ip": "^1.1.5",
+    "socket.io": "*",
+    "xmlhttprequest": "^1.8.0"
   }
 }

@@ -1,3 +1,34 @@
-<h1>
-    Android NodeJs
-</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Homepage</title>
+</head>
+
+<body>
+    <h1>Gửi lệnh</h1>
+    <p>Gửi lệnh khi xe không online</p>
+    <form class="command-form">
+        <label for="">Direction</label><br />
+        <input class="direction" type="number" placeholder="Hướng đi" /><br />
+        <label for="">Distance</label><br />
+        <input class="distance" type="number" placeholder="Khoảng cách" /><br />
+        <label for="">CreatedBy</label><br />
+        <input class="created-by" type="text" placeholder="Người tạo" /><br />
+        <button type="submit">Submit</button>
+    </form>
+
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-database.js"></script>
+
+    <script src="index.js"></script>
+
+</body>
+
+</html>
