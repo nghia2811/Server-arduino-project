@@ -6,8 +6,7 @@ app.get("/", function(req, res) {
 });
 
 //#Khởi tạo một chương trình mạng (app)
-//#include thư viện http - Tìm thêm về từ khóa http nodejs trên google nếu bạn muốn tìm hiểu thêm. 
-//Nhưng theo kinh nghiệm của mình, Javascript trong môi trường NodeJS cực kỳ rộng lớn, khi bạn bí thì nên tìm hiểu không nên ngồi đọc và cố gắng học thuộc hết cái reference (Tài liêu tham khảo) của nodejs làm gì. Vỡ não đó!
+//#include thư viện http 
 var server = require('http').createServer(app);
 var io = require("socket.io").listen(server); //#Phải khởi tạo io sau khi tạo app!
 var ip = require('ip');
@@ -59,29 +58,21 @@ io.on('connection', function(socket) { //'connection' (1) này khác gì với '
                 switch (direction) {
                     case 1:
                         io.sockets.emit('go-ahead', { "message": "goahead" });
-                        setTimeout(function() {
-                            io.sockets.emit('stop', { "message": "stop" });
-                        }, parseInt(distance));
                         break;
                     case 2:
                         io.sockets.emit('go-back', { "message": "goback" });
-                        setTimeout(function() {
-                            io.sockets.emit('stop', { "message": "stop" });
-                        }, parseInt(distance));
                         break;
                     case 3:
                         io.sockets.emit('right', { "message": "right" });
-                        setTimeout(function() {
-                            io.sockets.emit('stop', { "message": "stop" });
-                        }, parseInt(distance));
                         break;
                     case 4:
                         io.sockets.emit('left', { "message": "left" });
-                        setTimeout(function() {
-                            io.sockets.emit('stop', { "message": "stop" });
-                        }, parseInt(distance));
                         break;
                 }
+
+                setTimeout(function() {
+                    io.sockets.emit('stop', { "message": "stop" });
+                }, parseInt(distance));
                 console.log(direction, distance, createdBy);
             }
         });
@@ -116,9 +107,9 @@ io.on('connection', function(socket) { //'connection' (1) này khác gì với '
         var obj = JSON.parse(message);
 
         //   Get input Values
-        let direction = obj.DirectionCode;
-        let distance = obj.Distance;
-        let createdBy = obj.CreatedBy;
+        let direction = obj.direction;
+        let distance = obj.distance;
+        let createdBy = obj.createdBy;
 
         console.log(direction, distance, createdBy);
         saveCommand(direction, distance, createdBy);
