@@ -48,32 +48,54 @@ io.on('connection', function(socket) { //'connection' (1) này khác gì với '
         // ref.on("value", getData);
         ref.on("value", (snapshot) => {
             const info = snapshot.val();
-            let keys = Object.keys(info);
+            if (info) {
+                let keys = Object.keys(info);
 
-            for (let i = 0; i < keys.length; i++) {
-                let infoData = keys[i];
-                let direction = info[infoData].direction;
-                let distance = info[infoData].distance;
-                let createdBy = info[infoData].createdBy;
-                switch (direction) {
-                    case 1:
-                        io.sockets.emit('go-ahead', { "message": "goahead" });
-                        break;
-                    case 2:
-                        io.sockets.emit('go-back', { "message": "goback" });
-                        break;
-                    case 3:
-                        io.sockets.emit('right', { "message": "right" });
-                        break;
-                    case 4:
-                        io.sockets.emit('left', { "message": "left" });
-                        break;
+                var sum = 0;
+
+                for (let i = 0; i < keys.length; i++) {
+                    let infoData = keys[i];
+                    let direction = info[infoData].direction;
+                    let distance = info[keys[i - 1]] ? info[keys[i - 1]].distance : 0;
+                    sum += distance;
+                    let createdBy = info[infoData].createdBy;
+                    console.log(sum);
+                    setTimeout(function() {
+                        io.sockets.emit('stop', { "message": "stop" });
+                        console.log('stop');
+                        switch (direction) {
+                            case 1:
+                                io.sockets.emit('go-ahead', { "message": "goahead" });
+                                console.log('go-ahead');
+                                break;
+                            case 2:
+                                io.sockets.emit('go-back', { "message": "goback" });
+                                console.log('go-back');
+                                break;
+                            case 3:
+                                io.sockets.emit('right', { "message": "right" });
+                                console.log('right');
+                                break;
+                            case 4:
+                                io.sockets.emit('left', { "message": "left" });
+                                console.log('left');
+                                break;
+                            default:
+                                io.sockets.emit('stop', { "message": "stop" });
+                                console.log('stop');
+                                break;
+                        }
+                    }, sum);
+
+                    if (i == keys.length - 1) {
+                        let last = sum + info[keys[i]].distance;
+                        console.log(last);
+                        setTimeout(function() {
+                            io.sockets.emit('stop', { "message": "stop" });
+                            console.log('stop');
+                        }, last);
+                    }
                 }
-
-                setTimeout(function() {
-                    io.sockets.emit('stop', { "message": "stop" });
-                }, parseInt(distance));
-                console.log(direction, distance, createdBy);
             }
         });
     });
@@ -122,20 +144,7 @@ function saveCommand(direction, distance, createdBy) {
 
     newCommandList.set({
         direction: direction,
-        distance: distance,
+        distance: distance * 1000,
         createdBy: createdBy
     });
-}
-
-function getData(data) {
-    let info = data.val();
-    let keys = Object.keys(info);
-
-    for (let i = 0; i < keys.length; i++) {
-        let infoData = keys[i];
-        let direction = info[infoData].direction;
-        let distance = info[infoData].distance;
-        let createdBy = info[infoData].createdBy;
-        console.log(direction, distance, createdBy);
-    }
 }
